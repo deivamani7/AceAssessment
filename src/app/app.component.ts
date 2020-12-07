@@ -1,82 +1,167 @@
-import { Component, OnInit } from '@angular/core';
-import { FormArray, FormBuilder, FormGroup, Validators } from '@angular/forms';
+import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
+import { FormArray, FormBuilder, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
+import { MatPaginator } from '@angular/material/paginator';
+import { MatSidenav } from '@angular/material/sidenav';
+import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
+import { MatSort } from '@angular/material/sort';
+import { MatTableDataSource } from '@angular/material/table';
+import { Item } from './model/item';
+import { ItemDataService } from './service/item-data.service';
+import { PrintPDFService } from './service/print-pdf.service';
 
 @Component({
   selector: 'app-root',
   templateUrl: './app.component.html',
   styleUrls: ['./app.component.css']
 })
-export class AppComponent implements OnInit{
-  amountDisable:boolean = true;
-  total:number = 0;
+export class AppComponent implements OnInit,AfterViewInit  {
+  amountDisable: boolean = true;
+  total: number = 0;
+  totalValue:string="";
+  formTitle: string;
+  formButton: string;
   public form: FormGroup;
-  public itemList: FormArray;
-  constructor(private fb: FormBuilder) {}
+  public itemArray: Item[];
+  public displayedColumns = ['name', 'rate', 'quantity', 'amount', 'actions'];
+  public dataSource = new MatTableDataSource<Item>();
+  constructor(private fb: FormBuilder, private service: ItemDataService, private element: ElementRef,private pdfService: PrintPDFService,private _snackBar: MatSnackBar) { }
+  @ViewChild('sidenav') sidenav: MatSidenav;
+  @ViewChild('formDirective') private formDirective: NgForm;
+  @ViewChild(MatSort) sort: MatSort;
+  @ViewChild(MatPaginator) paginator: MatPaginator;
+  reason = '';
+  horizontalPosition: MatSnackBarHorizontalPosition = 'right';
+  verticalPosition: MatSnackBarVerticalPosition = 'top';
 
+
+
+  close(reason: string) {
+    this.reason = reason;
+    this.formDirective.resetForm();
+    this.sidenav.close();
+  }
   ngOnInit() {
-    this.form = this.fb.group({
-      items: this.fb.array([this.createItem()])
-    });
-    this.itemList = this.form.get('items') as FormArray;
-
-  }
-
-  createItem(): FormGroup {
-    return this.fb.group({
-      item: [null, Validators.compose([Validators.required])],
-      rate: [null, Validators.compose([Validators.required])],
-      quantity: [null, Validators.compose([Validators.required])],
-      amount: [null, Validators.compose([Validators.required])]
+    this.getAllItems();
+    this.form = new FormGroup({
+      id: new FormControl('',),
+      name: new FormControl('', [Validators.required]),
+      rate: new FormControl('', [Validators.required]),
+      quantity: new FormControl('', [Validators.required]),
+      amount: new FormControl('',),
+      createdAt: new FormControl('',),
+      updatedAt: new FormControl('',)
     });
   }
 
-  addItem() {
-    this.itemList.push(this.createItem());
+  ngAfterViewInit(): void {
+    this.dataSource.sort = this.sort;
+    this.dataSource.paginator = this.paginator;
   }
 
-  removeItem(index) {
-    this.itemList.removeAt(index);
-    this.total = 0;
-      for(let control of this.itemList.controls)
-      {
-        this.total = this.total + Number(control.get('amount').value);
-      }
-      this.total = Number(this.total.toFixed(2));
+  getAllItems() {
+    this.service.getAllItems().subscribe(data => {
+      this.dataSource.data = data as Item[];
+      this.itemArray = this.dataSource.data;
+      this.calculateTotal(this.dataSource.data);
+    })
   }
 
-  get itemFormGroup() {
-    return this.form.get('items') as FormArray;
+  update(element) {
+    this.formTitle = " Update Item";
+    this.formButton = "Update";
+    this.form.get('name').setValue(element.name);
+    this.form.get('rate').setValue(element.rate);
+    this.form.get('quantity').setValue(element.quantity);
+    this.form.get('amount').setValue(element.amount);
+    this.form.get('id').setValue(element.id);
+    this.sidenav.open();
   }
 
-  getItemsFormGroup(index): FormGroup {
-    const formGroup = this.itemList.controls[index] as FormGroup;
-    return formGroup;
+  openSnackBar(message) {
+    this._snackBar.open(message, 'End now', {
+      duration: 3000,
+      horizontalPosition: this.horizontalPosition,
+      verticalPosition: this.verticalPosition,
+    });
   }
 
-
-  submit() {
-    console.log(this.form.value);
+  delete(id: string) {
+    this.service.deleteItem(id).subscribe(data => {
+      this.getAllItems();
+    })
   }
 
-  call(item){
-    if(item.get('quantity').value >0 && item.get('rate').value > 0)
-    {
-      item.get('amount').setValue((item.get('quantity').value * item.get('rate').value).toFixed(2))
-      this.total = 0;
-      for(let control of this.itemList.controls)
-      {
-        this.total = this.total + Number(control.get('amount').value);
-      }
-      this.total = Number(this.total.toFixed(2));
-    }else{
-      item.get('amount').setValue("")
-      this.total = 0;
-      for(let control of this.itemList.controls)
-      {
-        this.total = this.total + Number(control.get('amount').value);
-      }
-      this.total = Number(this.total.toFixed(2));
+  call(item) {
+    if (item.quantity > 0 && item.rate > 0) {
+      this.form.get('amount').setValue((item.quantity * item.rate).toFixed(2))
+    }
+    if (item.quantity == "" || item.rate == "") {
+      this.form.get('amount').setValue("")
     }
   }
- 
+
+  saveItem(item) {
+    if (item.id == null) {
+      console.log("saving");
+      var itemObj = new Item();
+      itemObj.name = item.name;
+      itemObj.quantity = item.quantity
+      itemObj.rate = item.rate;
+      itemObj.amount = item.amount;
+      this.service.createItem(itemObj).subscribe(data => {
+        this.formDirective.resetForm();
+        this.close('Saved');
+        this.openSnackBar("New Item Added!!")
+        this.getAllItems();
+      })
+    } else {
+      console.log("updating")
+      var itemObj = new Item();
+      itemObj.name = item.name;
+      itemObj.quantity = item.quantity
+      itemObj.rate = item.rate;
+      itemObj.amount = item.amount;
+      this.service.updateItem(item.id, itemObj).subscribe(data => {
+        this.formDirective.resetForm();
+        this.openSnackBar("Item Updated!!")
+        this.close('Updated');
+        this.getAllItems();
+      })
+    }
+  }
+
+  public hasError = (controlName: string, errorName: string) => {
+    return this.form.controls[controlName].hasError(errorName);
+  }
+
+  calculateTotal(items) {
+    this.total = 0;
+    if (items.length > 0) {
+      for (let item of items) {
+        this.total = this.total + Number(item.amount);
+      }
+      this.total = Number(this.total.toFixed(2));
+      this.totalValue = this.total.toFixed(2);
+    }
+  }
+
+  openNav() {
+    this.formTitle = " Create New Item";
+    this.formButton = "Create";
+    this.formDirective.resetForm();
+    this.sidenav.open();
+  }
+
+  onCancel() {
+    this.formDirective.resetForm();
+    this.sidenav.close();
+  }
+
+  doFilter(value){
+    this.dataSource.filter = value.trim().toLocaleLowerCase();
+  }
+
+  printPDF(){
+    this.pdfService.generatePdf(this.totalValue,this.itemArray);
+  }
 }
