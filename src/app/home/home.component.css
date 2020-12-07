@@ -1,0 +1,72 @@
+.ng-invalid.ng-touched {
+    border-color: red;
+}
+
+.example-container {
+    position: absolute;
+    top: 0;
+    bottom: 0;
+    left: 0;
+    right: 0;
+  }
+
+  .sidenav{
+      width:300px;
+  }
+  
+  .action-button{
+      margin: 30px;
+  }
+  .mat-header-cell{
+      font-size:18px;
+  }
+
+  table {
+    width: 99%;
+    margin:auto;
+    overflow-x: auto;
+    overflow-y: hidden;
+    min-width: 500px;
+}
+th.mat-header-cell {
+    text-align: left;
+    max-width: 300px;
+    color:black;
+}
+mat-toolbar{
+    border-radius: 3px;
+}
+
+.mat-toolbar.mat-primary{
+    background-color:#FBB040
+}
+
+@media(max-width: 959px){
+    mat-toolbar{
+        border-radius: 0px;
+    }
+}
+
+tr.mat-header-row{
+    background-color: #FBB040;
+}
+
+.mat-form-field{
+    width: 100%;
+    margin: 0 0 20px 0;
+}
+
+mat-card-actions.mat-card-actions {
+    margin-top: 25px;
+}
+
+@media screen and (max-width: 600px) {
+    .action-button{
+        margin: 10px;
+    }
+  }
+
+  .spacer {
+    flex: 1 1 auto;
+  }
+  
