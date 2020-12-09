@@ -13,8 +13,6 @@ import { first } from 'rxjs/operators';
 export class LoginComponent implements OnInit {
   loginForm: FormGroup;
   loading = false;
-  submitted = false;
-  returnUrl: string;
   error = '';
 
   constructor(
@@ -24,7 +22,7 @@ export class LoginComponent implements OnInit {
       private authService: AuthService
   ) { 
       // redirect to home if already logged in
-      if (this.authService.currentUserValue) { 
+      if (this.authService.loggedInUserValue) { 
           this.router.navigate(['/']);
       }
   }
@@ -35,27 +33,17 @@ export class LoginComponent implements OnInit {
           password: ['', Validators.required]
       });
 
-      // get return url from route parameters or default to '/'
-      this.returnUrl = this.route.snapshot.queryParams['returnUrl'] || '/';
   }
 
-  // convenience getter for easy access to form fields
-  get f() { return this.loginForm.controls; }
+  get formControls() { return this.loginForm.controls; }
 
   submit() {
-      this.submitted = true;
-
-      // stop here if form is invalid
-      if (this.loginForm.invalid) {
-          return;
-      }
-
       this.loading = true;
-      this.authService.login(this.f.username.value, this.f.password.value)
+      this.authService.login(this.formControls.username.value, this.formControls.password.value)
           .pipe(first())
           .subscribe(
               data => {
-                  this.router.navigate([this.returnUrl]);
+                this.router.navigate(['/']);
               },
               error => {
                   this.error = error;
@@ -63,7 +51,7 @@ export class LoginComponent implements OnInit {
               });
   }
 
-  public hasError = (controlName: string, errorName: string) => {
+  hasError(controlName: string, errorName: string){
     return this.loginForm.controls[controlName].hasError(errorName);
   }
 }

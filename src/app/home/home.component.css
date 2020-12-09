@@ -2,7 +2,7 @@
     border-color: red;
 }
 
-.example-container {
+.home-container {
     position: absolute;
     top: 0;
     bottom: 0;
@@ -26,25 +26,16 @@
     margin:auto;
     overflow-x: auto;
     overflow-y: hidden;
-    min-width: 500px;
+    min-width: 300px;
 }
 th.mat-header-cell {
     text-align: left;
     max-width: 300px;
     color:black;
 }
-mat-toolbar{
-    border-radius: 3px;
-}
 
 .mat-toolbar.mat-primary{
     background-color:#FBB040
-}
-
-@media(max-width: 959px){
-    mat-toolbar{
-        border-radius: 0px;
-    }
 }
 
 tr.mat-header-row{
@@ -60,13 +51,73 @@ mat-card-actions.mat-card-actions {
     margin-top: 25px;
 }
 
+.spacer {
+    flex: 1 1 auto;
+}
+
+table .btn-sm{
+    margin-right: 10px;
+}
+
+.total-value{
+    float:left;
+    font-size: 20px;
+}
+
 @media screen and (max-width: 600px) {
     .action-button{
-        margin: 10px;
+        margin: 5px;
     }
-  }
+ }
+  
+ @media (min-width: 450px) and (max-width: 550px) {
+    table .btn-sm{
+        margin-right: 1px;
+        font-size:0.575rem;
+    }
 
-  .spacer {
-    flex: 1 1 auto;
-  }
+    .mat-header-cell{
+        font-size:12px;
+    }
+
+    .mat-cell{
+        font-size:12px;
+    }
+
+    .total-value{
+        font-size: 18px;
+    }
+
+    .action-button{
+        padding:0 5px;
+    }
+ }
+
+ @media screen and (max-width: 450px) {
+    td.mat-cell:last-of-type{
+        padding-right: 10px;
+    }
+
+    table .btn-sm{
+        margin-right: 1px;
+        font-size: 0.495rem;
+    }
+
+    .mat-header-cell{
+        font-size:10px;
+    }
+
+    .mat-cell{
+        font-size:10px;
+    }
+
+    .total-value{
+        font-size: 16px;
+    }
+
+    .action-button{
+        padding:0 5px;
+    }
+ }
+  
   

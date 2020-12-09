@@ -1,5 +1,5 @@
-import { AfterViewInit, Component, ElementRef, OnInit, ViewChild } from '@angular/core';
-import { FormArray, FormBuilder, FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
+import { AfterViewInit, Component, OnInit, ViewChild } from '@angular/core';
+import { FormControl, FormGroup, NgForm, Validators } from '@angular/forms';
 import { MatPaginator } from '@angular/material/paginator';
 import { MatSidenav } from '@angular/material/sidenav';
 import { MatSnackBar, MatSnackBarHorizontalPosition, MatSnackBarVerticalPosition } from '@angular/material/snack-bar';
@@ -16,32 +16,35 @@ import { PrintPDFService } from '../service/print-pdf.service';
   templateUrl: './home.component.html',
   styleUrls: ['./home.component.css']
 })
-export class HomeComponent implements OnInit,AfterViewInit  {
-  amountDisable: boolean = true;
-  total: number = 0;
-  totalValue:string="";
+export class HomeComponent implements OnInit, AfterViewInit {
+  totalValue: string = "";
   formTitle: string;
   formButton: string;
   public form: FormGroup;
   public itemArray: Item[];
   public displayedColumns = ['name', 'rate', 'quantity', 'amount', 'actions'];
   public dataSource = new MatTableDataSource<Item>();
-  constructor(private router: Router,private authService: AuthService,private fb: FormBuilder, private service: ItemDataService, private element: ElementRef,private pdfService: PrintPDFService,private _snackBar: MatSnackBar) { }
   @ViewChild('sidenav') sidenav: MatSidenav;
   @ViewChild('formDirective') private formDirective: NgForm;
   @ViewChild(MatSort) sort: MatSort;
   @ViewChild(MatPaginator) paginator: MatPaginator;
-  reason = '';
   horizontalPosition: MatSnackBarHorizontalPosition = 'right';
   verticalPosition: MatSnackBarVerticalPosition = 'top';
 
 
+  constructor(
+    private router: Router,
+    private authService: AuthService,
+    private service: ItemDataService,
+    private pdfService: PrintPDFService,
+    private snackBar: MatSnackBar) { }
 
-  close(reason: string) {
-    this.reason = reason;
+  close() {
     this.formDirective.resetForm();
     this.sidenav.close();
   }
+
+
   ngOnInit() {
     this.getAllItems();
     this.form = new FormGroup({
@@ -80,7 +83,7 @@ export class HomeComponent implements OnInit,AfterViewInit  {
   }
 
   openSnackBar(message) {
-    this._snackBar.open(message, 'End now', {
+    this.snackBar.open(message, 'End now', {
       duration: 3000,
       horizontalPosition: this.horizontalPosition,
       verticalPosition: this.verticalPosition,
@@ -89,7 +92,10 @@ export class HomeComponent implements OnInit,AfterViewInit  {
 
   delete(id: string) {
     this.service.deleteItem(id).subscribe(data => {
+      this.openSnackBar("Item Deleted!!")
       this.getAllItems();
+    }, error => {
+      this.openSnackBar("Item not Deleted!!")
     })
   }
 
@@ -104,46 +110,46 @@ export class HomeComponent implements OnInit,AfterViewInit  {
 
   saveItem(item) {
     if (item.id == null) {
-      console.log("saving");
       var itemObj = new Item();
       itemObj.name = item.name;
       itemObj.quantity = item.quantity
       itemObj.rate = item.rate;
       itemObj.amount = item.amount;
       this.service.createItem(itemObj).subscribe(data => {
-        this.formDirective.resetForm();
-        this.close('Saved');
+        this.close();
         this.getAllItems();
         this.openSnackBar("New Item Added!!")
+      }, error => {
+        this.openSnackBar("Item Not Added!!")
       })
     } else {
-      console.log("updating")
       var itemObj = new Item();
       itemObj.name = item.name;
       itemObj.quantity = item.quantity
       itemObj.rate = item.rate;
       itemObj.amount = item.amount;
       this.service.updateItem(item.id, itemObj).subscribe(data => {
-        this.formDirective.resetForm();
-        this.close('Updated');
+        this.close();
         this.getAllItems();
-        this.openSnackBar("Item Updated!!")
+        this.openSnackBar("Item Updated!!");
+      }, error => {
+        this.openSnackBar("Item Not Updated!!")
       })
     }
   }
 
-  public hasError = (controlName: string, errorName: string) => {
+  hasError(controlName: string, errorName: string) {
     return this.form.controls[controlName].hasError(errorName);
   }
 
   calculateTotal(items) {
-    this.total = 0;
+    var total = 0;
     if (items.length > 0) {
       for (let item of items) {
-        this.total = this.total + Number(item.amount);
+        total = total + Number(item.amount);
       }
-      this.total = Number(this.total.toFixed(2));
-      this.totalValue = this.total.toFixed(2);
+      total = Number(total.toFixed(2));
+      this.totalValue = total.toFixed(2);
     }
   }
 
@@ -154,22 +160,17 @@ export class HomeComponent implements OnInit,AfterViewInit  {
     this.sidenav.open();
   }
 
-  onCancel() {
-    this.formDirective.resetForm();
-    this.sidenav.close();
-  }
-
-  doFilter(value){
+  doFilter(value) {
     this.dataSource.filter = value.trim().toLocaleLowerCase();
   }
 
-  printPDF(){
-    this.pdfService.generatePdf(this.totalValue,this.itemArray);
+  printPDF() {
+    this.pdfService.generatePdf(this.totalValue, this.itemArray);
   }
 
   logout() {
     this.authService.logout();
     this.router.navigate(['/login']);
-}
+  }
 }
 

@@ -14,11 +14,7 @@ export class ItemDataService {
   getAllItems(): Observable<Item[]> {
     return this.http.get<Item[]>(this.baseUrl);
   }
-
-  getItem(id: any): Observable<Item> {
-    return this.http.get(`${this.baseUrl}/${id}`);
-  }
-
+  
   createItem(data: any): Observable<any> {
     return this.http.post(this.baseUrl, data);
   }
