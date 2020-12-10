@@ -11,7 +11,7 @@ export class AuthGuard implements CanActivate {
     canActivate(route: ActivatedRouteSnapshot, state: RouterStateSnapshot) {
         const loggedInUser = this.authService.loggedInUserValue;
         //if userdata is available, then it means user has logged in and it allows routing to home page
-        if (loggedInUser) {
+        if (this.authService.isloggedIn(loggedInUser)) {
             return true;
         }
 

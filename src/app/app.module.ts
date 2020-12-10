@@ -27,6 +27,7 @@ import { LoginComponent } from './login/login.component';
 import { ErrorComponent } from './error/error.component';
 import { ErrorInterceptor } from './interceptor/http-error-interceptor';
 import { LoginInterceptor } from './interceptor/login-interceptor';
+import { ServiceWorkerModule } from '@angular/service-worker';
 
 @NgModule({
   declarations: [
@@ -39,7 +40,7 @@ import { LoginInterceptor } from './interceptor/login-interceptor';
   imports: [
     BrowserModule,ReactiveFormsModule,FormsModule,MatSnackBarModule,
     HttpClientModule,FlexLayoutModule,MatFormFieldModule,MatInputModule,MatToolbarModule,MatSortModule,MatPaginatorModule,
-    BrowserAnimationsModule,MatSidenavModule,MatTableModule,MatIconModule ,MatCardModule, MatButtonModule, AppRoutingModule
+    BrowserAnimationsModule,MatSidenavModule,MatTableModule,MatIconModule ,MatCardModule, MatButtonModule, AppRoutingModule, ServiceWorkerModule.register('ngsw-worker.js', { enabled: environment.production })
   ],
   providers: [
     {provide: 'BASE_URL',useValue: environment.baseRestUrl},

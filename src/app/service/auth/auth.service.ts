@@ -29,6 +29,15 @@ export class AuthService {
             }));
     }
 
+    isloggedIn(loggedInUser) {
+        if (loggedInUser) {
+            return true
+        }
+        else {
+            return false
+        }
+    }
+
     logout() {
         // remove user from local storage and log out
         localStorage.removeItem('loggedInUser');

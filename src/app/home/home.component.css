@@ -26,11 +26,11 @@
     margin:auto;
     overflow-x: auto;
     overflow-y: hidden;
-    min-width: 300px;
+    min-width: 280px;
 }
 th.mat-header-cell {
     text-align: left;
-    max-width: 300px;
+    max-width: 280px;
     color:black;
 }
 
@@ -117,6 +117,9 @@ table .btn-sm{
 
     .action-button{
         padding:0 5px;
+    }
+    .sidenav{
+        width:280px;
     }
  }
   

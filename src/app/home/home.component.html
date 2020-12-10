@@ -2,7 +2,7 @@
     <mat-sidenav-content>
         <mat-toolbar color="primary">
           <a class="navbar-brand" href="#">
-            <img src="assets/img/ace-logo.png" width="150px" height="80px">
+            <img src="assets/img/ace-logo.png" alt="logo" width="150px" height="80px">
           </a>  
           <span class="spacer"></span>
           <button mat-raised-button style="background-color: black;color:#FBB040" (click)="logout()">Logout</button>
@@ -12,7 +12,7 @@
         </div>
         <div style="float:right">
     
-          <button mat-raised-button class="btn btn-primary action-button" color="primary" (click)="openNav()">+ Add
+          <button mat-raised-button class="btn btn-primary action-button" color="primary" id="add-item" (click)="openNav()">+ Add
             Item</button>
           <button mat-raised-button class="btn btn-primary action-button" color="primary" (click)="printPDF()" [disabled]="!itemArray"><i class="fa fa-print"></i> Print
             PDF</button>
@@ -56,7 +56,7 @@
       </mat-sidenav-content>
     <mat-sidenav class="sidenav" #sidenav (keydown.escape)="close()" disableClose>
       <section fxLayout="row wrap" fxLayoutAlign="center center" style="height:100%">
-        <mat-card fxFlex="300px" fxFlex.xs="100%" style="height:100%;background-color:#FBB040;">
+        <mat-card fxFlex="280px" fxFlex.xs="100%" style="height:100%;background-color:#FBB040;">
           <mat-card-title>{{formTitle}}</mat-card-title>
           <form [formGroup]="form" #formDirective="ngForm" autocomplete="off" novalidate fxLayout="column wrap"
             fxLayoutAlign="center center" fxLayoutGap="10px">

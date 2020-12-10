@@ -40,7 +40,6 @@ export class PrintPDFService {
   }
 
   getDocumentDefinition(totalValue, itemArray) {
-    console.log(totalValue);
     var dataArray = [];
     itemArray.forEach(element => {
       var dataObj = [];
