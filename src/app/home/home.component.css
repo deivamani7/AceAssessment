@@ -121,6 +121,10 @@ table .btn-sm{
     .sidenav{
         width:280px;
     }
+    .mat-card{
+        max-width:280px;
+        min-width:280px;
+    }
  }
   
   
